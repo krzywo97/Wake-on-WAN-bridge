@@ -6,7 +6,7 @@ import java.net.InetAddress
 import java.net.ServerSocket
 import java.util.*
 
-class TcpServer(port: Int) : Thread() {
+class TcpServer(private val broadcastAddress: String, port: Int) : Thread() {
     private var serverSocket: ServerSocket = ServerSocket(port)
 
     override fun run() {
@@ -17,10 +17,11 @@ class TcpServer(port: Int) : Thread() {
             val inputStream = exchangeSocket.getInputStream()
             val input = ByteArray(12)
             inputStream.read(input, 0, 12)
+            if (!isMacAddressValid(input)) continue
 
             val macAddress = String(input).lowercase(Locale.getDefault())
 
-            val broadcastAddress = InetAddress.getByName("192.168.0.255")
+            val broadcastAddress = InetAddress.getByName(broadcastAddress)
             val payload = ByteArray(102)
             for (i in 0..5) {
                 payload[i] = 0xff.toByte()
@@ -41,5 +42,17 @@ class TcpServer(port: Int) : Thread() {
         }
 
         serverSocket.close()
+    }
+
+    private fun isMacAddressValid(macAddress: ByteArray): Boolean {
+        for (b in macAddress) {
+            if (!((b >= '0'.code.toByte() && b <= '9'.code.toByte())
+                        || (b >= 'A'.code.toByte() && b <= 'F'.code.toByte())
+                        || (b >= 'a'.code.toByte() && b <= 'f'.code.toByte()))
+            ) {
+                return false
+            }
+        }
+        return true
     }
 }

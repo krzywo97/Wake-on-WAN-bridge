@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="service_running">#FF33CC33</color>
+    <color name="service_stopped">#FFCC3333</color>
+    <color name="service_unknown">#FFCCCCCC</color>
 </resources>
